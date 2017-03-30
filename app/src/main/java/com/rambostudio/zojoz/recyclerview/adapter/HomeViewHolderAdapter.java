@@ -1,5 +1,7 @@
 package com.rambostudio.zojoz.recyclerview.adapter;
 
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -7,82 +9,140 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.Toast;
+import android.widget.TextView;
 
+import com.rambostudio.zojoz.recyclerview.CollectionIndexUtils;
 import com.rambostudio.zojoz.recyclerview.R;
 import com.rambostudio.zojoz.recyclerview.listener.HomeRecyclerItemClickListener;
 import com.rambostudio.zojoz.recyclerview.model.Home;
-import com.rambostudio.zojoz.recyclerview.model.Person;
-import com.rambostudio.zojoz.recyclerview.view.HomeViewHolder;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by rambo on 30/3/2560.
  */
 
-public class HomeViewHolderAdapter extends RecyclerView.Adapter<HomeViewHolder> {
-    List<Home> homeList;
+public class HomeViewHolderAdapter extends RecyclerView.Adapter<HomeViewHolderAdapter.HomeViewHolder> {
+    List<Home> mDatas;
+
     public HomeViewHolderAdapter(List<Home> homeList) {
-        this.homeList = homeList;
+        this.mDatas = homeList;
     }
 
     @Override
     public HomeViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        //create new view
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.list_item_home, parent, false);
-
-        HomeViewHolder holder = new HomeViewHolder(view);
-        return holder;
+        return new HomeViewHolder(LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.list_item_home, parent, false));
     }
 
     @Override
     public void onBindViewHolder(HomeViewHolder holder, int position) {
 //Bind Data from onCreateViewHolder
-        holder.setHomeTitle(homeList.get(position).getTitle());
+        if (CollectionIndexUtils.isAvailableData(mDatas, position)) {
+            holder.setHomeTitle(mDatas.get(position).getTitle());
+            holder.bindData(mDatas.get(position));
 
-        holder.setOnClickListener(new HomeRecyclerItemClickListener() {
-            @Override
-            public void onClick(View view, int position, boolean isLongClick, MotionEvent motionEvent) {
-                if (view.getId() == R.id.btnAddPerson) {
+
+            holder.setOnClickListener(new HomeRecyclerItemClickListener() {
+                @Override
+                public void onClick(View view, int position, boolean isLongClick, MotionEvent motionEvent) {
+                    if (view.getId() == R.id.button_item_home_add_person) {
 //                    List<Person> personList = new ArrayList<Person>();
 //                    personList.add(new Person("Person 1"));
-//                    Home home = new Home("Home " + (homeList.size() + 1), personList);
-//                    insert(homeList.size(), home);
-                    Log.d("Home position", "Home position =" + position);
-//                    Toast.makeText(view.getContext(), position, Toast.LENGTH_LONG).show();
-                } else {
-//                    remove(position);
-//                    Log.d("remove position", "remove position =" + position);
+//                    Home home = new Home("Home " + (mDatas.size() + 1), personList);
+//                    insert(mDatas.size(), home);
+                        Log.d("Home position", "Home position =" + position);
+                    } else {
+
+                    }
                 }
-            }
-        });
-//
-//        View personView =  LayoutInflater.from()
-//                .inflate(R.layout.list_item_person, parent, false);
-//
-//        LinearLayout ll = (LinearLayout) view.findViewById(R.id.person_area);
-//        if (homeList.get()) {
-//        }
-//        ll.addView(personView);
+            });
+        }
     }
 
     @Override
     public int getItemCount() {
-        return homeList.size();
+        return mDatas.size();
     }
 
     public void insert(int position, Home home) {
-        homeList.add(home);
+        mDatas.add(home);
         notifyItemInserted(position);
     }
 
     public void remove(int position) {
-        homeList.remove(position);
+        mDatas.remove(position);
         notifyItemRemoved(position);
+    }
+
+
+    public class HomeViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener, View.OnTouchListener {
+
+        RecyclerView recyclerViewPerson;
+        TextView tvTitle;
+        Button btnAddPerson;
+        private HomeRecyclerItemClickListener homeRecyclerItemClickListener;
+
+        public HomeViewHolder(View itemView) {
+            super(itemView);
+
+            //FindViewById
+            tvTitle = (TextView) itemView.findViewById(R.id.textview_item_home_title);
+            btnAddPerson = (Button) itemView.findViewById(R.id.button_item_home_add_person);
+            recyclerViewPerson = (RecyclerView) itemView.findViewById(R.id.recyclerview_item_home_person);
+
+
+            btnAddPerson.setOnClickListener(this);
+            itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
+
+
+            recyclerViewPerson.setLayoutManager(new LinearLayoutManager(itemView.getContext()){
+                @Override
+                public boolean canScrollVertically() {
+                    return false;
+                }
+            });
+            recyclerViewPerson.addItemDecoration(new DividerItemDecoration(itemView.getContext(), DividerItemDecoration.VERTICAL));
+        }
+
+        public void setOnClickListener(HomeRecyclerItemClickListener itemClickListener) {
+            this.homeRecyclerItemClickListener = itemClickListener;
+        }
+
+        public void setHomeTitle(String name) {
+            tvTitle.setText(name);
+        }
+
+        public void bindData(Home home) {
+            if (null != home) {
+                tvTitle.setText(home.getTitle());
+                if (null != home.getPersonList()) {
+                    recyclerViewPerson.setAdapter(new PersonRecyclerAdapter(home.getPersonList()));
+                }
+            }
+        }
+
+        @Override
+        public void onClick(View view) {
+            homeRecyclerItemClickListener.onClick(view, getAdapterPosition(), false, null);
+//        if (view.getId() == R.id.btnAddPerson) {
+//            Toast.makeText(view.getContext(), "Press Home = " + String.valueOf(getAdapterPosition()), Toast.LENGTH_SHORT).show();
+//            HomeViewHolderAdapter adapter = new HomeViewHolderAdapter();
+//        }
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            homeRecyclerItemClickListener.onClick(view, getAdapterPosition(), true, null);
+            return true;
+        }
+
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            homeRecyclerItemClickListener.onClick(view, getAdapterPosition(), false, motionEvent);
+            return true;
+        }
     }
 
 }
