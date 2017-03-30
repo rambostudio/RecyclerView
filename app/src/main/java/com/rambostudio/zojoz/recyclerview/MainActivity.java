@@ -26,8 +26,6 @@ public class MainActivity extends AppCompatActivity {
         initMockUpData();
         findView();
         initRecyclerView();
-
-
     }
 
     private void initRecyclerView() {

@@ -15,6 +15,7 @@ import com.rambostudio.zojoz.recyclerview.CollectionIndexUtils;
 import com.rambostudio.zojoz.recyclerview.R;
 import com.rambostudio.zojoz.recyclerview.listener.HomeRecyclerItemClickListener;
 import com.rambostudio.zojoz.recyclerview.model.Home;
+import com.rambostudio.zojoz.recyclerview.model.Person;
 
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class HomeViewHolderAdapter extends RecyclerView.Adapter<HomeViewHolderAd
     public void onBindViewHolder(HomeViewHolder holder, int position) {
 //Bind Data from onCreateViewHolder
         if (CollectionIndexUtils.isAvailableData(mDatas, position)) {
-            holder.setHomeTitle(mDatas.get(position).getTitle());
+
             holder.bindData(mDatas.get(position));
 
 
@@ -51,9 +52,8 @@ public class HomeViewHolderAdapter extends RecyclerView.Adapter<HomeViewHolderAd
 //                    personList.add(new Person("Person 1"));
 //                    Home home = new Home("Home " + (mDatas.size() + 1), personList);
 //                    insert(mDatas.size(), home);
+                        insertPerson(position);
                         Log.d("Home position", "Home position =" + position);
-                    } else {
-
                     }
                 }
             });
@@ -73,6 +73,13 @@ public class HomeViewHolderAdapter extends RecyclerView.Adapter<HomeViewHolderAd
     public void remove(int position) {
         mDatas.remove(position);
         notifyItemRemoved(position);
+    }
+
+    public void insertPerson(int position) {
+        List<Person> persons = mDatas.get(position).getPersonList();
+        Person person = new Person("Person " + persons.size());
+        persons.add(person);
+        notifyDataSetChanged();
     }
 
 

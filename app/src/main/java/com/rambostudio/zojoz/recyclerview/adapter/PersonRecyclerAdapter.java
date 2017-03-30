@@ -22,7 +22,8 @@ public class PersonRecyclerAdapter extends RecyclerView.Adapter<PersonRecyclerAd
     private List<Person> mDatas = new ArrayList<>();
 
     public PersonRecyclerAdapter(List<Person> datas) {
-        replaceDatas(datas);
+//        replaceDatas(datas);
+        mDatas = datas;
     }
 
     public void replaceDatas(List<Person> datas) {
@@ -47,6 +48,7 @@ public class PersonRecyclerAdapter extends RecyclerView.Adapter<PersonRecyclerAd
     public int getItemCount() {
         return CollectionIndexUtils.getSize(mDatas);
     }
+
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public final TextView tvTitle;
